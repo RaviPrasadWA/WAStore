@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+{% load i18n %}
+{% load staticfiles %}
+{% load static swampdragon_tags %}
+
+
+<html lang="en" class="no-js">
+    <head>
+        <title>{% block title %}Wukora{% endblock %}</title>
+        {% block meta %}
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="{% block meta_description %}{% endblock %}">
+        {% endblock meta %}
+
+        <script src="{% static "js/storefront_head.js" %}"></script>
+        <link rel="stylesheet" type="text/css" href="{% static "css/storefront.css" %}">
+        <link rel="stylesheet" type="text/css" href="{% static "css/mystyle.css" %}">
+        <link rel="stylesheet" type="text/css" href="{% static "slippry/slippry.css" %}">
+
+        {% block stylesheet %}{% endblock stylesheet %}
+
+        <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+        <!--[if lt IE 9]>
+        <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+    </head>
+
+    <body itemscope itemtype="http://schema.org/WebPage">
+        {% block header %}
+            <header class="navbar navbar-default navbar-inverse navbar-static-top" role="navigation" >
+                <nav class="container clearfix">
+                    
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse" style="margin: 26px;">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        <a class="navbar-brand" href="/">
+                            <img src="{% static "img/logo.png" %}"alt="">
+                        </a>
+                    </div>
+
+                    <div class="collapse navbar-collapse navbar-ex1-collapse">
+                        
+                        <ul class="nav navbar-nav navbar-right">
+
+                            {% if user.is_authenticated %}
+                             <li class="mystyle-top-navbar dropdown dropdown-notification">
+                                <a class="dropdown-toggle" data-toggle="dropdown" href="#" ><i class="fa fa-envelope"></i>{% trans " Notifications" %}<b class="caret"></b>
+                                </a>
+                                <ul class="dropdown-menu" id="notifications">
+                                    {% for notification in  notifications %}
+                                        <li><a data-toggle="modal" href="#message-{{ notification.pk }}"><i class="fa fa-eye">
+                                            </i>{% trans " New Notification" %}</a></li>
+                                        <li class="divider"></li>
+                                    {% endfor %}
+                                </ul>
+                            </li>
+                            {% endif %}
+
+                            <li class="mystyle-top-navbar dropdown">
+                                <a data-toggle="dropdown" class="dropdown-toggle" href="{% url "cart:index" %}"><i class="fa fa-shopping-cart"></i> {% trans "Shopping cart" %} {% if request.cart %}<span class="badge">{{ request.cart.count }}</span>{% endif %} <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="{% url "cart:index" %}"><i class="glyphicon glyphicon-eye-open"></i>{% trans " Cart contents" %}</a></li>
+                                    {% if request.cart %}
+                                    <li class="divider"></li>
+                                    {% for item in request.cart %}
+                                    <li>
+                                        <a href="{% url 'product:details' slug=item.data.product_slug product_id=item.data.product_id %}">
+                                            {{ item.product }}{% if item.quantity != 1 %} <em>×{{ item.quantity }}</em>{% endif %}
+                                        </a>
+                                    </li>
+                                    {% endfor %}
+                                    <li class="divider"></li>
+                                    <li><a href="{% url "checkout:index" %}"><i class="glyphicon glyphicon-arrow-right"></i>{% trans " Checkout" %}</a></li>
+                                    {% endif %}
+                                </ul>
+                            </li>
+                            {% if user.is_authenticated %}
+
+                            <li class="mystyle-top-navbar dropdown">
+                                <a data-toggle="dropdown" class="dropdown-toggle" href="."><i class="glyphicon glyphicon-user"></i> {{ user }} <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="{% url "profile:details" %}"><i class="glyphicon glyphicon-user"></i>{% trans " Profile" %}</a></li>
+                                    <li><a href="{% url "profile:orders" %}"><i class="glyphicon glyphicon-list-alt"></i>{% trans " Orders" %}</a></li>
+                                    {% if user.is_staff %}
+                                        <li class="divider"></li>
+                                        <li><a href="{% url "dashboard:index" %}"><i class="glyphicon glyphicon-dashboard"></i>{% trans " Dashboard" %}</a></li>
+                                    {% endif %}
+                                    <li class="divider"></li>
+                                    <li><a href="{% url "registration:logout" %}"><i class="glyphicon glyphicon-off"></i>{% trans " Logout" %}</a></li>
+                                  </ul>
+                            </li>
+                            {% else %}
+                            <li class="mystyle-top-navbar">
+                                <a href="{% url "registration:login" %}">Log in</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </nav>
+            </header>
+        {% endblock %}
+        {% if messages %}
+        <div class="container">
+            {% for message in messages %}
+            <div class="alert{% if message.tags %} alert-{{ message.tags }}{% endif %}">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        <div class="container">
+            {% block outerbreadcrumb %}
+            <ul class="breadcrumb" itemprop="breadcrumb">
+                {% block breadcrumb %}
+                <li>
+                    <a href="/">{% trans "Home" %}</a>
+                </li>
+                {% endblock breadcrumb %}
+            </ul>
+            {% endblock outerbreadcrumb %}
+            {% block outercontent %}
+
+            
+
+            <div class="row">
+                <div class="col-sm-12">
+                    {% block content %}
+                        <div class="row">
+                            {% include "category/_items.html" %}
+                        </div>
+                    {% endblock content %}
+                </div>
+            </div>
+            {% endblock outercontent %}
+        </div>
+        {% block footer %}
+            <footer>
+                {% include "contactus.html" %}
+                <div class="container">
+                    <a data-toggle="modal" class="pull-right footer-info" href="#contactUsModal">
+                        <i class="fa fa-info-circle"></i> {% trans "About-Us" %} 
+                    </a>
+                    <a data-toggle="modal" class="pull-right footer-info" href="#callUsModal">
+                        <i class="fa fa-phone"></i> {% trans "Contact-Us" %} 
+                    </a>
+                    <a data-toggle="modal" class="pull-right footer-info" href="#connectOnModal">
+                        <i class="glyphicon glyphicon-thumbs-up"></i> {% trans "Connect-Us" %} 
+                    </a>
+                    <a data-toggle="modal" class="pull-right footer-info" href="#">
+                        <i class="glyphicon glyphicon-piggy-bank"></i> {% trans "Pay-Us" %} 
+                    </a>
+                    <a data-toggle="modal" class="pull-right footer-info" href="#thankYouModal">
+                        <i class="glyphicon glyphicon-heart"></i> {% trans "Thank-You" %} 
+                    </a>
+                </div>
+            </footer>
+        {% endblock %}
+
+        {% for notification in  notifications %}
+            {% include "_notification.html" %}
+        {% endfor %}
+        
+        {% block footer_scripts %}
+            <script src="{% static "js/storefront.js" %}"></script>
+
+            <script type="text/javascript">
+                $('.breadcrumb').hide();
+            </script>
+
+            <script type="text/javascript">
+                $('#contact-us')[0].style.textAlign = 'center';
+                $('#contact-us')[0].style.color = 'rgb(157, 157, 157)';
+                $('#call-us')[0].style.textAlign = 'center';
+                $('#call-us')[0].style.color = 'rgb(157, 157, 157)';
+            </script>
+
+            <script type="text/javascript">
+                $('.dropdown-menu').each(function(){
+                    $(this)[0].style.marginTop = "10px";
+                });
+            </script>
+
+            <script type="text/javascript">
+                var e = $('.col-sm-12 p')[0];
+                if(e){
+                    e.style.padding = "10px";
+                    e.style.border ="3px solid";
+                    e.style.borderRadius = "20px";
+                    e.style.borderColor = "rgb(51, 160, 190)";
+                    e.style.textAlign = 'center';
+                    e.style.color = "rgb(225, 234, 63)";
+                }
+            </script>
+            <script type="text/javascript" src="{% static 'slippry/slippry.min.js' %}"></script>
+            <script>
+                $('#slippry-slider').slippry({});
+            </script>
+            {% swampdragon_settings %}
+                <script type="text/javascript" src="{% static 'swampdragon/js/vendor/sockjs-0.3.4.min.js' %}"></script>
+                <script type="text/javascript" src="{% static 'swampdragon/js/legacy/swampdragon.js' %}"></script>
+                <script type="text/javascript" src="{% static 'swampdragon/js/legacy/swampdragon-vanilla.js' %}"></script>
+                <script type="text/javascript" src="{% static 'swampdragon/js/notifications.js' %}"></script>
+
+        {% endblock footer_scripts %}
+    </body>
+</html>

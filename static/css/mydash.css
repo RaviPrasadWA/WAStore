@@ -1,0 +1,27 @@
+nav {
+	background-color: #309AB5;
+}
+
+.body-products .header .side-nav li.subnav-products a{
+	background-color: #309AB5;
+}
+
+.body-attributes .header .side-nav li.subnav-attributes a{
+	background-color: #309AB5;
+}
+
+.body-categories .header .side-nav li.subnav-categories a{
+	background-color: #309AB5;
+}
+
+.body-orders .header .side-nav li.subnav-orders a{
+	background-color: #309AB5;
+}
+
+.body-customers .header .side-nav li.subnav-customers a{
+	background-color: #309AB5;
+}
+
+.body-payments .header .side-nav li.subnav-payments a{
+	background-color: #309AB5;
+}
